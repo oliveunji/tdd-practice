@@ -4,7 +4,7 @@
   "description": "tdd with express",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app",
+    "start": "nodemon index",
     "test": "jest --watch",
     "lint": "eslint ."
   },
@@ -12,7 +12,10 @@
   "author": "Eunji Kim",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "bcrypt": "^5.1.0",
+    "express": "^4.18.2",
+    "sequelize": "^6.25.3",
+    "sqlite3": "^5.1.2"
   },
   "devDependencies": {
     "eslint": "^8.26.0",
@@ -25,7 +28,7 @@
   },
   "eslintConfig": {
     "parserOptions": {
-      "ecmaVersion": 6
+      "ecmaVersion": 2018
     },
     "extends": [
       "eslint:recommended",
