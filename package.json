@@ -15,6 +15,7 @@
     "bcrypt": "^5.1.0",
     "config": "^3.3.8",
     "express": "^4.18.2",
+    "express-validator": "^6.14.2",
     "sequelize": "^6.25.3",
     "sqlite3": "^5.1.2"
   },
@@ -51,6 +52,7 @@
   },
   "prettier": {
     "singleQuote": true,
-    "printWidth": 120
+    "printWidth": 120,
+    "endOfLine":"crlf"
   }
 }
