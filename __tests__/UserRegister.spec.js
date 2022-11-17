@@ -3,7 +3,6 @@ const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
 // const nodemailerStub = require('nodemailer-stub');
-const EmailService = require('../src/email/EmailService');
 const SMTPServer = require('smtp-server').SMTPServer;
 
 let lastMail, server;
