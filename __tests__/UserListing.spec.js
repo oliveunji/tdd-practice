@@ -2,6 +2,7 @@ const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
+const { describe } = require('../src/user/User');
 
 beforeAll(async () => {
   await sequelize.sync();
@@ -73,5 +74,83 @@ describe('Listing Users', () => {
     await addUsers(11);
     const response = await getUsers().query({ page: -5 });
     expect(response.body.page).toBe(0);
+  });
+
+  it(`returns 5 users and corresponding size indicator when size is set as 5 in request parameter`, async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ size: 5 });
+    expect(response.body.content.length).toBe(5);
+    expect(response.body.size).toBe(5);
+  });
+  it('returns 10 users and corresponding size indicator when size is set as 1000', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ size: 1000 });
+    expect(response.body.content.length).toBe(10);
+    expect(response.body.size).toBe(10);
+  });
+  it('returns 10 users and corresponding size indicator when size is set as 0', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ size: 0 });
+    expect(response.body.content.length).toBe(10);
+    expect(response.body.size).toBe(10);
+  });
+  it('returns page as zero and size as 10 when non numeric query params provide for both', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ size: 'size', page: 'page' });
+    expect(response.body.size).toBe(10);
+    expect(response.body.page).toBe(0);
+  });
+});
+
+describe('Get User', () => {
+  it('returns 404 when user not found', async () => {
+    const response = await request(app).get('/api/1.0/users/5');
+    expect(response.status).toBe(404);
+  });
+  it.each`
+    language | message
+    ${'kr'}  | ${'사용자를 찾을 수 없습니다'}
+    ${'en'}  | ${'User not found'}
+  `('returns $message for unknown user when language is set to $language', async ({ language, message }) => {
+    const response = await request(app).get('/api/1.0/users/5').set('Accept-Language', language);
+    expect(response.body.message).toBe(message);
+  });
+  it('returns proper error body when user not found', async () => {
+    const nowInMillis = new Date().getTime();
+    const response = await request(app).get('/api/1.0/users/5');
+    const error = response.body;
+    expect(error.path).toBe('/api/1.0/users/5');
+    expect(error.timestamp).toBeGreaterThan(nowInMillis);
+    expect(Object.keys(error)).toEqual(['path', 'timestamp', 'message']);
+  });
+  it('returns 200 when an active user exist', async () => {
+    const user = await User.create({
+      username: 'user1',
+      email: 'user1mail.com',
+      inactive: false,
+    });
+
+    const response = await getUsers(user.id);
+    expect(response.status).toBe(200);
+  });
+  it('return id, username and email in response body when an active user exist', async () => {
+    const user = await User.create({
+      username: 'user1',
+      email: 'user1mail.com',
+      inactive: false,
+    });
+
+    const response = await getUsers(user.id);
+    expect(Object.keys(response.body)).toEqual(['id', 'username', 'email']);
+  });
+  it('returns 404 when the user is inactive', async () => {
+    const user = await User.create({
+      username: 'user1',
+      email: 'user1mail.com',
+      inactive: false,
+    });
+
+    const response = await getUsers(user.id);
+    expect(response.status).toBe(404);
   });
 });
