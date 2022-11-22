@@ -102,6 +102,9 @@ describe('Listing Users', () => {
 });
 
 describe('Get User', () => {
+  const getUser = (id = 5) => {
+    return request(app).get('/api/1.0/users/' + id);
+  };
   it('returns 404 when user not found', async () => {
     const response = await request(app).get('/api/1.0/users/5');
     expect(response.status).toBe(404);
@@ -111,12 +114,12 @@ describe('Get User', () => {
     ${'kr'}  | ${'사용자를 찾을 수 없습니다'}
     ${'en'}  | ${'User not found'}
   `('returns $message for unknown user when language is set to $language', async ({ language, message }) => {
-    const response = await request(app).get('/api/1.0/users/5').set('Accept-Language', language);
+    const response = await getUser().set('Accept-Language', language);
     expect(response.body.message).toBe(message);
   });
   it('returns proper error body when user not found', async () => {
     const nowInMillis = new Date().getTime();
-    const response = await request(app).get('/api/1.0/users/5');
+    const response = await getUser();
     const error = response.body;
     expect(error.path).toBe('/api/1.0/users/5');
     expect(error.timestamp).toBeGreaterThan(nowInMillis);
@@ -129,26 +132,26 @@ describe('Get User', () => {
       inactive: false,
     });
 
-    const response = await getUsers(user.id);
+    const response = await getUser(user.id);
     expect(response.status).toBe(200);
   });
   it('return id, username and email in response body when an active user exist', async () => {
     const user = await User.create({
       username: 'user1',
-      email: 'user1mail.com',
+      email: 'user1@mail.com',
       inactive: false,
     });
 
-    const response = await getUsers(user.id);
+    const response = await getUser(user.id);
     expect(Object.keys(response.body)).toEqual(['id', 'username', 'email']);
   });
   it('returns 404 when the user is inactive', async () => {
     const user = await User.create({
       username: 'user1',
-      email: 'user1mail.com',
-      inactive: false,
+      email: 'user1@mail.com',
+      inactive: true,
     });
-    const response = await getUsers(user.id);
+    const response = await getUser(user.id);
     expect(response.status).toBe(404);
   });
 });
