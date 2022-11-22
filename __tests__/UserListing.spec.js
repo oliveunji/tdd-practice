@@ -2,7 +2,6 @@ const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
-const { describe } = require('../src/user/User');
 
 beforeAll(async () => {
   await sequelize.sync();
@@ -149,7 +148,6 @@ describe('Get User', () => {
       email: 'user1mail.com',
       inactive: false,
     });
-
     const response = await getUsers(user.id);
     expect(response.status).toBe(404);
   });
