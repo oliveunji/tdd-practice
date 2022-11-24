@@ -31,10 +31,12 @@ beforeAll(async () => {
 
   await server.listen(8587, 'localhost');
   await sequelize.sync();
+  jest.setTimeout(20000);
 });
 
 afterAll(async () => {
   await server.close();
+  jest.setTimeout(5000);
 });
 
 beforeEach(async () => {
