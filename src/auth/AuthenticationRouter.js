@@ -25,7 +25,7 @@ router.post('/api/1.0/auth', check('email').isEmail(), async (req, res, next) =>
     return next(new ForbiddenException());
   }
 
-  const token = TokenService.createToken(user);
+  const token = await TokenService.createToken(user);
 
   res.send({
     id: user.id,
@@ -34,4 +34,12 @@ router.post('/api/1.0/auth', check('email').isEmail(), async (req, res, next) =>
   });
 });
 
+router.post('/api/1.0/logout', async (req, res) => {
+  const authorization = req.headers.authorization;
+  if (authorization) {
+    const token = authorization.substring(7);
+    await TokenService.deleteToken(token);
+  }
+  res.send();
+});
 module.exports = router;
