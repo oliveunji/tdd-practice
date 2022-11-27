@@ -6,6 +6,7 @@ const ValidationException = require('../error/ValidationException');
 const pagination = require('../middleware/pagination');
 const ForbiddenException = require('../error/ForbiddenException');
 const tokenAuthentication = require('../middleware/tokenAuthentication');
+const TokenService = require('../auth/TokenService');
 
 router.post(
   '/api/1.0/users',
@@ -94,6 +95,9 @@ router.delete('/api/1.0/users/:id', tokenAuthentication, async (req, res, next) 
     return next(new ForbiddenException('unauthorized_user_delete'));
   }
   await UserService.deleteUser(req.params.id);
+  const authorization = req.headers.authorization;
+  const token = authorization.substring(7);
+  await TokenService.deleteToken(token);
   res.send();
 });
 

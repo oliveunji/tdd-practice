@@ -7,6 +7,7 @@ const EmailException = require('../email/EmailException');
 const InvalidTokenException = require('./InvalidTokenException');
 const UserNotFoundException = require('./UserNotFoundException');
 const { randomString } = require('../shared/generator');
+
 const save = async (body) => {
   const { username, email, password } = body;
   const hash = await bcrypt.hash(password, 10);
